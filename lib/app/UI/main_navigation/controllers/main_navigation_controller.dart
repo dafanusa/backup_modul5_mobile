@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../notification/controllers/notification_controller.dart';
 
 class MainNavigationController extends GetxController {
   final RxInt currentIndex = 0.obs;
@@ -21,6 +22,21 @@ class MainNavigationController extends GetxController {
     "Profil",
   ];
 
+@override
+  void onReady() {
+    super.onReady();
+
+    // Panggil consumePendingRoute setelah MainNavigation Controller (Halaman Utama)
+    // siap dimuat. Ini memastikan tidak ada crash atau bentrok routing.
+
+    try {
+      final notificationController = Get.find<NotificationController>();
+      notificationController.consumePendingRoute();
+      print("✅ Navigasi notifikasi Terminated dicek.");
+    } catch (e) {
+      print("❌ Error saat mencoba menemukan NotificationController: $e");
+    }
+  }
   void changeTab(int index) => currentIndex.value = index;
 
   void onDoubleTapTab(int index) {
@@ -29,6 +45,7 @@ class MainNavigationController extends GetxController {
       changeTab(index);
     }
   }
+  
 
   IconData getIconFromName(String name) {
     switch (name) {

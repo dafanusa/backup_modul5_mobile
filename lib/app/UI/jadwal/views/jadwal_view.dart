@@ -186,40 +186,74 @@ class JadwalView extends GetView<JadwalController> {
   }
 
   // ============================ EVENT CARD ============================
-  Widget _eventCard(BuildContext context, JadwalModel e) {
+Widget _eventCard(BuildContext context, JadwalModel e) {
     final theme = Theme.of(context);
     final loginC = Get.find<LoginController>();
 
-    Color color = e.category == "Latihan"
-        ? theme.colorScheme.primary
-        : theme.colorScheme.secondary;
+    final isLatihan = e.category == "Latihan";
+
+    final bgColor = isLatihan
+        ? const Color(0xFF0D47A1) // biru latihan
+        : const Color(0xFF7A0000); // maroon pertandingan
+
+    final badgeColor = isLatihan ? Colors.lightBlueAccent : Colors.orangeAccent;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(12),
+        color: bgColor,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
 
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // LEFT INFO
+          // ================= LEFT INFO =================
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // KATEGORI BADGE
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                margin: const EdgeInsets.only(bottom: 6),
+                decoration: BoxDecoration(
+                  color: badgeColor,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  e.category.toUpperCase(),
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+
               Text(
                 e.title,
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
+                  fontSize: 15,
                 ),
               ),
+
+              const SizedBox(height: 2),
+
               Text(
                 controller.formatDate(e.date),
                 style: const TextStyle(color: Colors.white70, fontSize: 12),
               ),
+
               Text(
                 e.time,
                 style: const TextStyle(
@@ -230,7 +264,7 @@ class JadwalView extends GetView<JadwalController> {
             ],
           ),
 
-          // ADMIN BUTTONS
+          // ================= ADMIN BUTTONS =================
           if (loginC.userRole.value == "admin")
             Row(
               children: [
@@ -248,6 +282,7 @@ class JadwalView extends GetView<JadwalController> {
       ),
     );
   }
+
 
   // ============================ DIALOG FORM ============================
   void _showAddDialog(BuildContext context) {
@@ -343,15 +378,16 @@ class JadwalView extends GetView<JadwalController> {
           );
         } else {
           // ADD
-          controller.addJadwal(
-            JadwalModel(
-              id: controller.nextId,
-              title: titleC.text,
-              time: timeC.text,
-              date: selectedDate,
-              category: category.value,
-            ),
-          );
+controller.addJadwal(
+  JadwalModel(
+    id: 0, // dummy, Supabase yang isi
+    title: titleC.text,
+    time: timeC.text,
+    date: selectedDate,
+    category: category.value,
+  ),
+);
+
         }
 
         Get.back();
